@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>嘉豪 mc站点</title>
+<title>站主QQ：3832465208</title>
+<style>
+body{
+background-color: rgb(0, 0, 0);
+text-align: center;
+margin: 0;
+overflow-x: hidden;
+overflow-y: auto;
+padding-bottom: 120px;
+}
+/* 代码雨画布 铺满全屏，置于底层 */
+#matrixCanvas {
+position: fixed;
+top: 0;
+left: 0;
+width: 100vw;
+height: 100vh;
+z-index: -1;
+}
+h1 {
+color: hsl(0, 0%, 100%);
+text-shadow: 0 0 20px hsl(209, 72%, 55%);
+}
+h2 {
+color: #ff0000;
+text-shadow: 0 0 20px hsl(209, 72%, 55%);
+}
+img{
+border-radius: 50%;
+box-shadow: 0 0 30px hsl(209, 72%, 55%);
+margin-top: 20px;
+width: 150px;
+}
+@keyframes leftrightmove {
+0% {transform: translateX(20px);}
+100% {transform: translateX(-20px);}
+}
+.main-link h1{
+animation: leftrightmove 1.5s ease-in-out infinite alternate ;
+color: hwb(241 13% 52%);
+font-size: 32px;
+margin-top: 30px;
+display: inline-block;
+}
+/* 额外链接样式 */
+.other-links{
+margin-top: 40px;
+}
+.other-links a{
+display: block;
+color: #8cf;
+font-size: 20px;
+margin: 12px 0;
+text-decoration: none;
+text-shadow: 0 0 10px #00aaff;
+transition: all 0.2s;
+}
+.other-links a:hover{
+color: #fff;
+text-shadow: 0 0 20px #00ddff;
+transform: scale(1.05);
+}
+.link-title{
+color: #ff4444;
+font-size: 24px;
+margin: 30px 0 10px;
+text-shadow: 0 0 15px red;
+}
+a {
+text-decoration: none;
+}
+
+/* ========== 新增Dock栏样式 ========== */
+.dock-wrap{
+position: fixed;
+bottom: 10px;
+left: 50%;
+transform: translateX(-50%);
+padding: 8px 16px;
+background: rgba(255,255,255,0.12);
+backdrop-filter: blur(12px);
+border-radius: 22px;
+box-shadow: 0 0 25px #0099ff66;
+z-index: 999;
+}
+.dock-item{
+display: inline-block;
+margin: 0 8px;
+transition: all 0.25s ease;
+}
+.dock-item img{
+width: 48px;
+height: 48px;
+border-radius: 12px;
+box-shadow: 0 0 12px #00aaff;
+margin: 0;
+}
+/* 悬浮放大效果 */
+.dock-item:hover{
+transform: translateY(-12px) scale(1.2);
+}
+.dock-tip{
+position: absolute;
+bottom: 60px;
+left: 50%;
+transform: translateX(-50%);
+background: #111;
+color: #fff;
+padding: 4px 10px;
+border-radius: 6px;
+font-size: 14px;
+white-space: nowrap;
+opacity: 0;
+pointer-events: none;
+transition: 0.2s;
+}
+.dock-item:hover .dock-tip{
+opacity: 1;
+}
+</style>
+</head>
+<body>
+<!-- 代码雨画布 -->
+<canvas id="matrixCanvas"></canvas>
+
+<h1>嘉豪</h1>
+<h2>seewo</h2>
+<img src="https://cdn.phototourl.com/free/2026-07-02-0465d646-bc1a-4c02-9dc5-f7b0f66d225b.png" onclick="alert('嘉豪暗网')">
+
+<a href="https://www.daott.cn/435.html" class="main-link">
+    <h1>进入不找了.cn</h1>
+</a>
+
+<!-- 分类超链接区域 -->
+<div class="other-links">
+    <div class="link-title">MC游戏专区</div>
+    <a href="https://www.mcbbs.net/">我的世界中文论坛</a>
+    <a href="https://www.minecraft.net/">MC官方网站</a>
+    <a href="https://optifine.net/">Optifine高清修复</a>
+    <a href="https://modrinth.com/">模组资源站Modrinth</a>
+
+    <div class="link-title">工具实用链接</div>
+    <a href="https://www.bing.com/">必应搜索</a>
+    <a href="https://tool.chinaz.com/">站长工具</a>
+    <a href="https://www.qq.com/">腾讯QQ官网</a>
+    <a href="https://www.bilibili.com/">哔哩哔哩</a>
+
+    <div class="link-title">娱乐社区链接</div>
+    <a href="https://www.douyin.com/">抖音官网</a>
+    <a href="https://www.kuaishou.com/new-reco">快手官网</a>
+    <a href="https://weibo.com/">新浪微博</a>
+    <a href="https://music.163.com/">网易云音乐</a>
+
+    <div class="link-title">其他资源站点</div>
+    <a href="https://github.com/">GitHub开源仓库</a>
+    <a href="https://www.51miz.com/">素材资源网站</a>
+    <a href="https://www.12306.cn/">12306购票</a>
+</div>
+
+<!-- 底部Dock导航栏 -->
+<div class="dock-wrap">
+    <a href="https://www.mcjs.cc/" class="dock-item">
+        <div class="dock-tip">MC主页</div>
+        <img src="https://picsum.photos/id/237/48/48">
+    </a>
+    <a href="https://www.bilibili.com/" class="dock-item">
+        <div class="dock-tip">B站</div>
+        <img src="https://picsum.photos/id/10/48/48">
+    </a>
+    <a href="https://github.com/" class="dock-item">
+        <div class="dock-tip">GitHub</div>
+        <img src="https://picsum.photos/id/11/48/48">
+    </a>
+    <a href="https://www.bing.com/" class="dock-item">
+        <div class="dock-tip">搜索</div>
+        <img src="https://picsum.photos/id/12/48/48">
+    </a>
+    <a href="https://www.mcbbs.net/" class="dock-item">
+        <div class="dock-tip">MC论坛</div>
+        <img src="https://picsum.photos/id/13/48/48">
+    </a>
+</div>
+
+<script>
+
+// 代码雨JS
+const canvas = document.getElementById('matrixCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZqwertyuiopasdfghjklzxcvbnm';
+const charArr = chars.split('');
+const fontSize = 16;
+let columns = canvas.width / fontSize;
+let drops = [];
+
+for(let x = 0; x < columns; x++) {
+    drops[x] = Math.random() * -canvas.height;
+}
+
+function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0f0';
+    ctx.font = fontSize + 'px monospace';
+
+    for(let i = 0; i < drops.length; i++) {
+        const text = charArr[Math.floor(Math.random() * charArr.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+        }
+        drops[i]++;
+    }
+}
+setInterval(drawMatrix, 35);
+</script>
+</body>
+</html>

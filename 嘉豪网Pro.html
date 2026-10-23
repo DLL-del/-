@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>嘉豪 mc站点</title>
+<title>站主QQ：3832465208</title>
+<style>
+/* ========== 全局 ========== */
+body{
+    margin:0;
+    background:#000;
+    color:#fff;
+    text-align:center;
+    font-family:"Segoe UI","Microsoft YaHei",sans-serif;
+    text-rendering:optimizeLegibility;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+    padding-bottom:260px;
+    transition:background .35s,color .35s;
+}
+body.light-mode{
+    background:#ffffff;
+    color:#111;
+}
+
+/* 代码雨 */
+#matrixCanvas{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+}
+body.light-mode #matrixCanvas{
+    display:none;
+}
+
+/* ========== 登录状态栏（字号=标题） ========== */
+.topbar{
+    position:sticky;
+    top:0;
+    width:100%;
+    padding:14px 0;
+    background:rgba(0,0,0,.8);
+    backdrop-filter:blur(14px);
+    z-index:1000;
+    font-size:32px;
+    font-weight:900;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:16px;
+    border-bottom:2px solid rgba(0,170,255,.3);
+}
+.topbar.logged-out{
+    color:#ff4444;
+    text-shadow:0 0 14px #ff0000;
+}
+.topbar.logged-in{
+    color:#00ddff;
+    text-shadow:0 0 14px #00aaff;
+}
+.top-avatar{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:2px solid #00aaff;
+    box-shadow:0 0 12px #00aaff;
+    cursor:pointer;
+    object-fit:cover;
+}
+
+/* 左上角低配电脑 */
+.lowpc-btn{
+    position:fixed;
+    top:70px;
+    left:14px;
+    z-index:1001;
+    padding:8px 14px;
+    border-radius:18px;
+    border:none;
+    background:linear-gradient(90deg,#0099ff,#00ddff);
+    color:#000;
+    font-weight:900;
+    font-size:14px;
+    cursor:pointer;
+}
+
+/* 右上角登录 */
+.top-login-btn{
+    position:fixed;
+    top:70px;
+    right:14px;
+    z-index:1001;
+    padding:8px 14px;
+    border-radius:18px;
+    border:none;
+    background:linear-gradient(90deg,#0099ff,#00ddff);
+    color:#000;
+    font-weight:900;
+    font-size:14px;
+    cursor:pointer;
+}
+
+/* 标题 */
+h1{
+    font-size:32px;
+    color:#fff;
+    text-shadow:0 0 20px #3a8dff;
+    margin-top:30px;
+}
+h2{
+    font-size:24px;
+    color:#ff4444;
+    text-shadow:0 0 20px #ff4444;
+}
+img{
+    border-radius:50%;
+    box-shadow:0 0 30px #3a8dff;
+    margin-top:20px;
+    width:150px;
+}
+@keyframes leftrightmove{
+    0%{transform:translateX(20px);}
+    100%{transform:translateX(-20px);}
+}
+.main-link h1{
+    animation:leftrightmove 1.5s ease-in-out infinite alternate;
+    color:hwb(241 13% 52%);
+}
+
+/* ========== 超链接（字号=标题） ========== */
+.other-links{
+    margin-top:40px;
+}
+.other-links a{
+    display:block;
+    font-size:32px;
+    color:#8cf;
+    margin:14px 0 4px;
+    text-decoration:none;
+    text-shadow:0 0 12px #00aaff;
+}
+.other-links a:hover{
+    color:#fff;
+    text-shadow:0 0 24px #00ddff;
+}
+.link-title{
+    font-size:36px;
+    color:#ff4444;
+    margin:36px 0 12px;
+    text-shadow:0 0 18px red;
+}
+.ext-btn{
+    display:inline-block;
+    margin-bottom:16px;
+    padding:8px 18px;
+    border-radius:14px;
+    background:linear-gradient(135deg,rgba(0,153,255,.25),rgba(0,221,255,.25));
+    border:1px solid #00aaff;
+    color:#8cf;
+    font-size:20px;
+    cursor:pointer;
+    text-shadow:0 0 10px #00aaff;
+}
+.ext-btn:hover{
+    background:linear-gradient(90deg,#0099ff,#00ddff);
+    color:#000;
+}
+
+/* ========== 留言板 ========== */
+.feedback-panel{
+    position:fixed;
+    bottom:20px;
+    left:20px;
+    width:320px;
+    max-height:380px;
+    background:rgba(0,0,0,.8);
+    backdrop-filter:blur(12px);
+    border-radius:16px;
+    padding:16px;
+    z-index:999;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+.feedback-panel h3{
+    margin:0;
+    font-size:22px;
+    color:#00ddff;
+}
+.feedback-list{
+    flex:1;
+    overflow-y:auto;
+    font-size:18px;
+    text-align:left;
+}
+.feedback-item{
+    background:rgba(255,255,255,.08);
+    border-radius:10px;
+    padding:10px;
+    margin-bottom:10px;
+    cursor:pointer;
+    user-select:none;
+}
+.feedback-item span{
+    color:#ffaa00;
+    font-size:14px;
+}
+.feedback-input{
+    display:flex;
+    gap:8px;
+}
+.feedback-input input{
+    flex:1;
+    padding:8px;
+    border-radius:8px;
+    border:1px solid #00aaff;
+    background:rgba(255,255,255,.1);
+    color:#fff;
+    font-size:16px;
+}
+.feedback-input button{
+    padding:8px 12px;
+    border-radius:8px;
+    border:none;
+    background:linear-gradient(90deg,#0099ff,#00ddff);
+    color:#000;
+    font-weight:900;
+    cursor:pointer;
+}
+
+/* 弹窗 */
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    backdrop-filter:blur(8px);
+    z-index:2000;
+    display:none;
+    align-items:center;
+    justify-content:center;
+}
+.modal.show{display:flex;}
+.modal-box{
+    width:360px;
+    padding:26px;
+    background:rgba(0,0,0,.9);
+    border-radius:20px;
+}
+.close-btn{
+    position:absolute;
+    top:12px;
+    right:16px;
+    background:none;
+    border:none;
+    color:#ff4444;
+    font-size:26px;
+    cursor:pointer;
+}
+.modal-tabs{
+    display:flex;
+    justify-content:space-around;
+    margin-bottom:20px;
+}
+.modal-tabs button{
+    background:none;
+    border:none;
+    font-size:20px;
+    color:#8cf;
+    padding-bottom:6px;
+    border-bottom:2px solid transparent;
+    cursor:pointer;
+}
+.modal-tabs button.active{
+    color:#00ddff;
+    border-bottom-color:#00ddff;
+}
+.modal-form{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+.modal-form.hidden{display:none;}
+.modal-form input{
+    padding:12px;
+    border-radius:12px;
+    border:1px solid #00aaff;
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    font-size:18px;
+}
+.modal-form button{
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    background:linear-gradient(90deg,#0099ff,#00ddff);
+    color:#000;
+    font-weight:900;
+    font-size:18px;
+    cursor:pointer;
+}
+.avatar-preview{
+    width:130px;
+    height:130px;
+    border-radius:50%;
+    object-fit:cover;
+    border:3px solid #00aaff;
+    box-shadow:0 0 20px #00aaff;
+    margin-bottom:18px;
+}
+</style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+
+<!-- 登录状态栏 -->
+<div class="topbar logged-out" id="loginStatus">
+    ⚠ 未登录，请点击右上角登录
+    <img id="topAvatar" class="top-avatar" src="" onclick="openAvatarCenter()">
+</div>
+
+<button class="lowpc-btn" id="lowPcBtn" onclick="toggleLowPC()">低配电脑：开</button>
+<button class="top-login-btn" onclick="openModal()">登录 / 注册</button>
+
+<!-- 登录弹窗 -->
+<div class="modal" id="loginModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeModal()">×</button>
+        <div class="modal-tabs">
+            <button class="active" onclick="switchTab('login')">登录</button>
+            <button onclick="switchTab('register')">注册</button>
+        </div>
+        <form class="modal-form" id="loginForm">
+            <input type="text" id="loginUsername" placeholder="用户名" maxlength="20" required>
+            <input type="password" id="loginPassword" placeholder="密码" maxlength="32" required>
+            <button type="submit">登 录</button>
+        </form>
+        <form class="modal-form hidden" id="registerForm">
+            <input type="text" id="regUsername" placeholder="设置用户名" maxlength="20" required>
+            <input type="password" id="regPassword" placeholder="设置密码" maxlength="32" required>
+            <input type="password" id="regConfirmPwd" placeholder="确认密码" maxlength="32" required>
+            <button type="submit">注 册</button>
+        </form>
+    </div>
+</div>
+
+<!-- 头像中心 -->
+<div class="modal" id="avatarModal">
+    <div class="modal-box" style="text-align:center;">
+        <button class="close-btn" onclick="closeModalAvatar()">×</button>
+        <img id="avatarPreview" class="avatar-preview" src="">
+        <input type="file" accept="image/png" onchange="previewAvatar(event)">
+        <br><br>
+        <button onclick="saveAvatar()">保存头像</button>
+    </div>
+</div>
+
+<h1>嘉豪</h1>
+<h2>seewo</h2>
+<img src="https://cdn.phototourl.com/free/2026-07-02-0465d646-bc1a-4c02-9dc5-f7b0f66d225b.png">
+
+<a href="https://www.daott.cn/435.html" class="main-link"><h1>进入不找了.cn</h1></a>
+<div class="ext-btn" onclick="window.open('https://daott.cn/')">扩展：daott导航</div>
+
+<!-- ========== 超链接（字号已放大） ========== -->
+<div class="other-links">
+
+    <div class="link-title">MC游戏专区</div>
+    <a href="https://www.mcbbs.net/" target="_blank">我的世界中文论坛</a>
+    <div class="ext-btn" onclick="window.open('https://www.mcmod.cn/')">扩展：MC百科</div>
+    <a href="https://www.minecraft.net/" target="_blank">MC官方网站</a>
+    <div class="ext-btn" onclick="window.open('https://feedback.minecraft.net/')">扩展：官方反馈</div>
+    <a href="https://optifine.net/" target="_blank">Optifine高清修复</a>
+    <div class="ext-btn" onclick="window.open('https://irisshaders.net/')">扩展：Iris光影</div>
+    <a href="https://modrinth.com/" target="_blank">模组资源站Modrinth</a>
+    <div class="ext-btn" onclick="window.open('https://www.curseforge.com/minecraft/mc-mods')">扩展：CurseForge</div>
+
+    <div class="link-title">工具实用链接</div>
+    <a href="https://www.bing.com/" target="_blank">必应搜索</a>
+    <div class="ext-btn" onclick="window.open('https://duckduckgo.com/')">扩展：DuckDuckGo</div>
+    <a href="https://tool.chinaz.com/" target="_blank">站长工具</a>
+    <div class="ext-btn" onclick="window.open('https://www.aizhan.com/')">扩展：爱站网</div>
+    <a href="https://www.qq.com/" target="_blank">腾讯QQ官网</a>
+    <div class="ext-btn" onclick="window.open('https://tim.qq.com/')">扩展：TIM</div>
+    <a href="https://www.bilibili.com/" target="_blank">哔哩哔哩</a>
+    <div class="ext-btn" onclick="window.open('https://www.acfun.cn/')">扩展：AcFun</div>
+
+    <div class="link-title">娱乐社区链接</div>
+    <a href="https://www.douyin.com/" target="_blank">抖音官网</a>
+    <div class="ext-btn" onclick="window.open('https://www.xiaohongshu.com/')">扩展：小红书</div>
+    <a href="https://www.kuaishou.com/new-reco" target="_blank">快手官网</a>
+    <div class="ext-btn" onclick="window.open('https://www.huya.com/')">扩展：虎牙直播</div>
+    <a href="https://weibo.com/" target="_blank">新浪微博</a>
+    <div class="ext-btn" onclick="window.open('https://www.toutiao.com/')">扩展：今日头条</div>
+    <a href="https://music.163.com/" target="_blank">网易云音乐</a>
+    <div class="ext-btn" onclick="window.open('https://y.qq.com/')">扩展：QQ音乐</div>
+
+    <div class="link-title">其他资源站点</div>
+    <a href="https://github.com/" target="_blank">GitHub开源仓库</a>
+    <div class="ext-btn" onclick="window.open('https://gitlab.com/')">扩展：GitLab</div>
+    <a href="https://www.51miz.com/" target="_blank">素材资源网站</a>
+    <div class="ext-btn" onclick="window.open('https://unsplash.com/')">扩展：Unsplash</div>
+    <a href="https://www.12306.cn/" target="_blank">12306购票</a>
+    <div class="ext-btn" onclick="window.open('https://www.ctrip.com/')">扩展：携程旅行</div>
+
+</div>
+
+<!-- 留言板 -->
+<div class="feedback-panel">
+    <h3>💬 玩家反馈</h3>
+    <div class="feedback-list" id="feedbackList"></div>
+    <div class="feedback-input">
+        <input id="feedbackInput" placeholder="写下反馈..." maxlength="200">
+        <button onclick="addFeedback()">发送</button>
+    </div>
+</div>
+
+<script>
+/* 代码雨 */
+const c=document.getElementById('matrixCanvas'),ctx=c.getContext('2d');
+function resize(){c.width=innerWidth;c.height=innerHeight;}resize();
+window.onresize=resize;
+const chars='0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZqwertyuiopasdfghjklzxcvbnm';
+const f=16,cols=c.width/f,drops=[];
+for(let i=0;i<cols;i++)drops[i]=Math.random()*-c.height;
+function rain(){
+    ctx.fillStyle='rgba(0,0,0,0.05)';ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#0f0';ctx.font=f+'px monospace';
+    for(let i=0;i<drops.length;i++){
+        ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*f,drops[i]*f);
+        if(drops[i]*f>c.height&&Math.random()>0.975)drops[i]=0;
+        drops[i]++;
+    }
+}
+let rainTimer=setInterval(rain,35);
+
+/* 低配电脑 */
+let lowPcOn=true;
+function toggleLowPC(){
+    lowPcOn=!lowPcOn;
+    document.getElementById('lowPcBtn').textContent=lowPcOn?'低配电脑：开':'低配电脑：关';
+    document.body.classList.toggle('light-mode');
+    if(lowPcOn){rainTimer=setInterval(rain,35);}
+    else{clearInterval(rainTimer);}
+}
+
+/* 登录弹窗 */
+function openModal(){document.getElementById('loginModal').classList.add('show');}
+function closeModal(){document.getElementById('loginModal').classList.remove('show');}
+function switchTab(t){
+    document.querySelectorAll('.modal-tabs button').forEach(b=>b.classList.remove('active'));
+    if(t==='login'){
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('registerForm').classList.add('hidden');
+        document.querySelectorAll('.modal-tabs button')[0].classList.add('active');
+    }else{
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.querySelectorAll('.modal-tabs button')[1].classList.add('active');
+    }
+}
+
+/* 安全 */
+function safeInput(v){return v.replace(/[<>&\"'\\]/g,'').trim();}
+async function sha256(t){
+    const b=new TextEncoder().encode(t);
+    const h=await crypto.subtle.digest('SHA-256',b);
+    return [...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+/* 默认头像 */
+const defaultAvatar='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAABBUlEQVR4nO2WwQ2DMAxEX0DgDJyAk3AGTnIKTsAJOAGn4AQcAVegLCS2NdtmtjSk/P9JkizfBGBZ1vcBgGEYA8/zxuR5/hzH8UaKoui21v5er6IoGmMsy3oJwzB2SZLcWmtTSZJcWmuLKeWttfYppZRSSimllFJKKaWUUkr9AXRfD3E6XzXPAAAAAElFTkSuQmCC';
+
+/* 登录状态 */
+async function updateLoginState(){
+    const u=localStorage.getItem('currentUser');
+    const s=localStorage.getItem('userSign');
+    const el=document.getElementById('loginStatus');
+    const avatar=document.getElementById('topAvatar');
+
+    if(u&&s===await sha256(u+'嘉豪Salt')){
+        el.className='topbar logged-in';
+        el.firstChild.textContent=`👤 欢迎回来，${u}`;
+        avatar.src=localStorage.getItem('avatar_'+u)||defaultAvatar;
+    }else{
+        el.className='topbar logged-out';
+        el.firstChild.textContent='⚠ 未登录，请点击右上角登录';
+        avatar.src=defaultAvatar;
+    }
+}
+updateLoginState();
+
+/* 头像中心 */
+function openAvatarCenter(){
+    if(!localStorage.getItem('currentUser')){
+        alert('请先登录');
+        return;
+    }
+    document.getElementById('avatarPreview').src=document.getElementById('topAvatar').src;
+    document.getElementById('avatarModal').classList.add('show');
+}
+function previewAvatar(e){
+    const file=e.target.files[0];
+    if(!file || file.type!=='image/png'){
+        alert('仅支持PNG格式');
+        return;
+    }
+    const r=new FileReader();
+    r.onload=ev=>document.getElementById('avatarPreview').src=ev.target.result;
+    r.readAsDataURL(file);
+}
+function saveAvatar(){
+    const u=localStorage.getItem('currentUser');
+    localStorage.setItem('avatar_'+u,document.getElementById('avatarPreview').src);
+    updateLoginState();
+    closeModalAvatar();
+}
+function closeModalAvatar(){
+    document.getElementById('avatarModal').classList.remove('show');
+}
+
+/* 登录 / 注册 */
+document.getElementById('registerForm').onsubmit=async e=>{
+    e.preventDefault();
+    const u=safeInput(regUsername.value),p=regPassword.value,c=regConfirmPwd.value;
+    if(u.length<3||p.length<6){alert('用户名≥3，密码≥6');return;}
+    const users=JSON.parse(localStorage.getItem('mcUsers')||'{}');
+    if(users[u]){alert('用户已存在');return;}
+    users[u]=await sha256(p);
+    localStorage.setItem('mcUsers',JSON.stringify(users));
+    alert('注册成功');switchTab('login');
+};
+document.getElementById('loginForm').onsubmit=async e=>{
+    e.preventDefault();
+    const u=safeInput(loginUsername.value),p=await sha256(loginPassword.value);
+    const users=JSON.parse(localStorage.getItem('mcUsers')||'{}');
+    if(users[u]===p){
+        localStorage.setItem('currentUser',u);
+        localStorage.setItem('userSign',await sha256(u+'嘉豪Salt'));
+        updateLoginState();closeModal();
+    }else alert('账号或密码错误');
+};
+
+/* 留言板（长按删除） */
+let pressTimer=null;
+function loadFeedback(){
+    const list=JSON.parse(localStorage.getItem('siteFeedback')||'[]');
+    const box=document.getElementById('feedbackList');
+    box.innerHTML='';
+    list.reverse().forEach((fb,index)=>{
+        const div=document.createElement('div');
+        div.className='feedback-item';
+        div.innerHTML=`<b>${fb.user}</b><br>${fb.text}<br><span>${fb.time}</span>`;
+        div.dataset.index=list.length-1-index;
+        div.addEventListener('mousedown',startPress);
+        div.addEventListener('touchstart',startPress);
+        div.addEventListener('mouseup',cancelPress);
+        div.addEventListener('mouseleave',cancelPress);
+        div.addEventListener('touchend',cancelPress);
+        box.appendChild(div);
+    });
+}
+function startPress(e){
+    const index=this.dataset.index;
+    const fb=JSON.parse(localStorage.getItem('siteFeedback')||'[]')[index];
+    const me=localStorage.getItem('currentUser');
+    if(!me || fb.user!==me) return;
+    pressTimer=setTimeout(()=>{
+        if(confirm('删除这条反馈？')){
+            const list=JSON.parse(localStorage.getItem('siteFeedback')||'[]');
+            list.splice(index,1);
+            localStorage.setItem('siteFeedback',JSON.stringify(list));
+            loadFeedback();
+        }
+    },1500);
+}
+function cancelPress(){clearTimeout(pressTimer);}
+function addFeedback(){
+    const input=document.getElementById('feedbackInput');
+    const text=input.value.trim();
+    if(!text) return;
+    const u=localStorage.getItem('currentUser')||'匿名玩家';
+    const time=new Date().toLocaleString();
+    const list=JSON.parse(localStorage.getItem('siteFeedback')||'[]');
+    list.push({user:u,text:text,time:time});
+    localStorage.setItem('siteFeedback',JSON.stringify(list));
+    input.value='';
+    loadFeedback();
+}
+loadFeedback();
+</script>
+</body>
+</html>

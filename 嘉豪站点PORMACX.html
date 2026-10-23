@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>嘉豪 mc站点（QQ：3832465208）</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="referrer" content="no-referrer">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+    background:#000;color:#fff;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;
+    text-align:center;overflow-x:hidden;
+    padding-top:100px;padding-bottom:70px;
+    -webkit-font-smoothing:antialiased;
+    transition:background .3s,color .3s;
+}
+
+/* ===== 嘉豪头像 ===== */
+.jiahao-avatar{
+    display:block;margin:24px auto 20px;
+    width:88px;height:88px;border-radius:50%;
+    border:3px solid #fff;
+    box-shadow:0 0 20px rgba(255,255,255,.8),0 0 50px rgba(0,170,255,.5);
+    object-fit:cover;background:#000;
+}
+
+/* ===== 右下角音乐按钮 ===== */
+.music-btn{
+    position:fixed;right:16px;bottom:16px;z-index:9999;
+    width:48px;height:48px;border-radius:50%;
+    border:2px solid rgba(0,170,255,.5);
+    background:rgba(0,40,80,.7);backdrop-filter:blur(6px);
+    color:#00ddff;font-size:20px;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    transition:all .3s;
+}
+.music-btn.muted{color:rgba(255,255,255,.3);border-color:rgba(255,255,255,.15);}
+.music-btn.muted::after{
+    content:'';position:absolute;
+    width:24px;height:3px;background:#00ddff;
+    transform:rotate(-45deg);border-radius:2px;
+}
+
+/* ===== 音量控制条 ===== */
+.volume-container{
+    position:fixed;right:16px;bottom:72px;z-index:9999;
+    display:flex;align-items:center;gap:6px;
+    background:rgba(0,40,80,.7);backdrop-filter:blur(6px);
+    border:2px solid rgba(0,170,255,.5);border-radius:24px;
+    padding:6px 12px;
+    transition:opacity .3s,transform .3s;
+    opacity:1;transform:translateY(0);pointer-events:auto;
+}
+.volume-container.show{opacity:1;transform:translateY(0);pointer-events:auto;}
+.volume-container .vol-icon{font-size:16px;color:#00ddff;cursor:pointer;user-select:none;}
+.volume-container input[type=range]{
+    -webkit-appearance:none;appearance:none;
+    width:100px;height:4px;border-radius:2px;
+    background:linear-gradient(to right,#00ddff 0%,#00ddff 80%,rgba(255,255,255,.2) 80%);
+    outline:none;cursor:pointer;
+}
+.volume-container input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;
+    background:#00ddff;cursor:pointer;
+    box-shadow:0 0 6px #00aaff;border:none;
+}
+.volume-container input[type=range]::-moz-range-thumb{
+    width:14px;height:14px;border-radius:50%;
+    background:#00ddff;cursor:pointer;
+    box-shadow:0 0 6px #00aaff;border:none;
+}
+.volume-container .vol-value{
+    color:#00ddff;font-size:12px;font-weight:700;
+    min-width:32px;text-align:right;
+}
+
+/* ===== 代码雨 ===== */
+#matrixCanvas{position:fixed;inset:0;z-index:-1;pointer-events:none;}
+
+/* ===== 登录状态栏 ===== */
+.topbar{
+    position:fixed;top:0;left:0;width:100%;height:56px;
+    background:rgba(0,0,0,.92);backdrop-filter:blur(14px);
+    z-index:30000;font-size:22px;font-weight:900;
+    display:flex;justify-content:center;align-items:center;gap:12px;
+    border-bottom:2px solid rgba(0,170,255,.5);transition:all .3s;
+}
+.topbar.logged-out{color:#ff4444;text-shadow:0 0 14px #ff0000;}
+.topbar.logged-in{color:#00ddff;text-shadow:0 0 14px #00aaff;}
+
+.top-avatar{
+    width:36px;height:36px;border-radius:50%;
+    border:2px solid #00aaff;box-shadow:0 0 10px #00aaff;
+    cursor:pointer;object-fit:cover;display:none;
+}
+.topbar.logged-in .top-avatar{display:block;}
+
+.logout-btn{
+    padding:3px 10px;border-radius:10px;border:none;
+    background:linear-gradient(90deg,#ff4444,#ff8888);
+    color:#fff;font-size:13px;font-weight:900;cursor:pointer;display:none;
+}
+.topbar.logged-in .logout-btn{display:inline-block;}
+
+/* ===== 功能按钮 ===== */
+.lowpc-btn,.top-login-btn{
+    position:fixed;top:68px;z-index:10001;
+    padding:6px 14px;border-radius:16px;border:none;
+    background:linear-gradient(90deg,#0099ff,#00ddff);
+    color:#000;font-weight:900;font-size:13px;cursor:pointer;transition:all .3s;
+}
+.lowpc-btn{left:14px;}
+.top-login-btn{right:14px;}
+
+/* ===== 在线人数 ===== */
+.online-count{
+    position:fixed;left:14px;top:72px;z-index:10001;
+    padding:3px 10px;border-radius:10px;
+    background:rgba(0,40,80,.75);backdrop-filter:blur(6px);
+    border:1px solid rgba(0,170,255,.35);
+    color:#00ddff;font-size:11px;font-weight:700;
+    display:flex;align-items:center;gap:5px;
+    pointer-events:none;white-space:nowrap;
+}
+.online-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:#00ff88;box-shadow:0 0 6px #00ff88;
+    animation:pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ===== 标题 ===== */
+h1{font-size:32px;color:#fff;text-shadow:0 0 20px #3a8dff;margin-top:20px;}
+h2{font-size:24px;color:#ff4444;text-shadow:0 0 20px #ff4444;}
+img.avatar{border-radius:50%;box-shadow:0 0 30px #3a8dff;margin-top:20px;width:150px;}
+.main-link h1{animation:leftrightmove 1.5s ease-in-out infinite alternate;color:hwb(241 13% 52%);}
+@keyframes leftrightmove{0%{transform:translateX(20px);}100%{transform:translateX(-20px);}}
+
+/* ===== 链接区 ===== */
+.other-links{margin-top:30px;padding:0 10px;}
+.other-links a{
+    display:block;font-size:26px;color:#4da6ff;margin:10px 0 2px;
+    text-decoration:none;text-shadow:0 0 12px #0066cc;
+}
+.other-links a:hover{color:#fff;text-shadow:0 0 24px #00ddff;}
+.link-title{font-size:28px;color:#ff4444;margin:30px 0 10px;text-shadow:0 0 18px red;}
+
+.other-links .ext-btn{
+    display:inline-block;margin:0 0 16px 0;padding:5px 16px;border-radius:12px;
+    background:linear-gradient(135deg,rgba(0,100,255,.25),rgba(0,180,255,.2));
+    border:1px solid #0099ff;color:#4da6ff;font-size:13px;cursor:pointer;transition:all .3s;
+}
+.other-links .ext-btn:hover{
+    background:linear-gradient(90deg,#0099ff,#00ddff);color:#000;
+    box-shadow:0 0 12px rgba(0,170,255,.5);
+}
+
+/* ===== 留言板 ===== */
+.feedback-panel{
+    position:fixed;left:0;bottom:0;
+    width:320px;max-height:300px;
+    background:rgba(0,10,30,.92);backdrop-filter:blur(14px);
+    padding:10px 8px 8px 10px;z-index:5000;
+    display:flex;flex-direction:column;gap:6px;
+    border-top:1px solid rgba(0,100,255,.2);
+    border-right:1px solid rgba(0,100,255,.2);
+    border-top-right-radius:14px;
+}
+.feedback-panel h3{margin:0;font-size:14px;color:#00ccff;text-shadow:0 0 8px #0066cc;}
+.feedback-list{flex:1;overflow-y:auto;font-size:13px;text-align:left;}
+.feedback-item{
+    position:relative;background:rgba(0,80,180,.15);border-radius:8px;
+    padding:8px 28px 8px 10px;margin-bottom:6px;
+    border:1px solid rgba(0,120,255,.1);word-break:break-all;
+}
+.feedback-item b{color:#00ccff;font-size:12px;}
+.feedback-item .fb-text{color:#e0e8f0;font-size:13px;margin:4px 0;}
+.feedback-item span{color:#ffaa00;font-size:9px;}
+.feedback-delete{
+    position:absolute;top:4px;right:6px;background:none;border:none;
+    color:#ff4444;font-size:18px;cursor:pointer;font-weight:900;line-height:1;
+    padding:2px 4px;border-radius:4px;transition:all .2s;
+}
+.feedback-delete:hover{color:#fff;background:rgba(255,0,0,.25);text-shadow:0 0 6px #ff0000;}
+.feedback-input{display:flex;gap:4px;}
+.feedback-input input{
+    flex:1;padding:6px 8px;border-radius:8px;
+    border:1px solid #0066cc;background:rgba(0,30,80,.35);color:#fff;font-size:13px;
+}
+.feedback-input input::placeholder{color:rgba(100,180,255,.4);}
+.feedback-input button{
+    padding:6px 12px;border-radius:8px;border:none;
+    background:linear-gradient(90deg,#0066cc,#00aaff);
+    color:#fff;font-weight:900;cursor:pointer;font-size:12px;transition:all .3s;white-space:nowrap;
+}
+.feedback-input button:hover{background:linear-gradient(90deg,#0099ff,#00ddff);color:#000;}
+
+/* ===== 弹窗 ===== */
+.modal{
+    position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);
+    z-index:35000;display:none;align-items:center;justify-content:center;
+}
+.modal.show{display:flex;}
+.modal-box{
+    width:360px;padding:24px;background:rgba(0,10,30,.96);border-radius:20px;
+    position:relative;border:1px solid rgba(0,120,255,.3);box-shadow:0 0 40px rgba(0,100,255,.25);
+}
+.close-btn{
+    position:absolute;top:10px;right:14px;background:none;border:none;
+    color:#ff4444;font-size:28px;cursor:pointer;font-weight:900;line-height:1;
+}
+.close-btn:hover{text-shadow:0 0 10px #ff0000;}
+.modal-tabs{display:flex;justify-content:space-around;margin-bottom:18px;}
+.modal-tabs button{
+    background:none;border:none;font-size:20px;color:#4da6ff;
+    padding-bottom:6px;border-bottom:2px solid transparent;cursor:pointer;transition:all .3s;
+}
+.modal-tabs button.active{color:#00ddff;border-bottom-color:#00ddff;}
+.modal-form{display:flex;flex-direction:column;gap:12px;}
+.modal-form.hidden{display:none;}
+.modal-form input{
+    padding:12px;border-radius:12px;border:1px solid #0066cc;
+    background:rgba(0,30,80,.3);color:#fff;font-size:18px;
+}
+.modal-form input::placeholder{color:rgba(100,180,255,.45);}
+.modal-form button{
+    padding:12px;border-radius:12px;border:none;
+    background:linear-gradient(90deg,#0066cc,#00aaff);
+    color:#fff;font-weight:900;font-size:18px;cursor:pointer;transition:all .3s;
+}
+.modal-form button:hover{background:linear-gradient(90deg,#0099ff,#00ddff);color:#000;}
+.avatar-preview{
+    width:130px;height:130px;border-radius:50%;object-fit:cover;
+    border:3px solid #00aaff;box-shadow:0 0 20px #0066cc;margin-bottom:18px;
+}
+
+/* ===== Toast ===== */
+.toast{
+    position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:rgba(0,20,60,.92);color:#00ddff;padding:14px 32px;border-radius:14px;
+    font-size:18px;font-weight:700;z-index:40000;
+    opacity:0;transition:opacity .3s;pointer-events:none;
+    border:1px solid rgba(0,150,255,.4);box-shadow:0 0 30px rgba(0,100,255,.3);
+}
+.toast.show{opacity:1;}
+
+/* ===== 低配模式 ===== */
+body.lowpc{background:#fff!important;color:#111!important;}
+body.lowpc .topbar{background:rgba(255,255,255,.97)!important;border-bottom-color:rgba(0,100,200,.3)!important;}
+body.lowpc .topbar.logged-out{color:#cc0000;text-shadow:0 0 10px #ff4444;}
+body.lowpc .topbar.logged-in{color:#0066cc;text-shadow:0 0 10px #0099ff;}
+body.lowpc .ext-btn{background:linear-gradient(135deg,rgba(0,100,200,.08),rgba(0,180,255,.08));border-color:#0066cc;color:#0066cc;}
+body.lowpc .ext-btn:hover{background:linear-gradient(90deg,#0066cc,#00aaff);color:#fff;}
+body.lowpc .other-links a{color:#004499;text-shadow:0 0 8px rgba(0,80,200,.25);}
+body.lowpc .other-links a:hover{color:#000;text-shadow:0 0 12px #00aaff;}
+body.lowpc .link-title{color:#cc0000;text-shadow:0 0 12px #ff4444;}
+body.lowpc .feedback-panel{background:rgba(240,248,255,.97)!important;border-color:rgba(0,100,200,.15);}
+body.lowpc .feedback-panel h3{color:#0066cc;}
+body.lowpc .feedback-item{background:rgba(0,80,180,.06);border-color:rgba(0,100,200,.12);}
+body.lowpc .feedback-item b{color:#0066cc;}
+body.lowpc .feedback-item .fb-text{color:#333;}
+body.lowpc .feedback-input input{background:rgba(0,40,80,.06);border-color:#0066cc;color:#111;}
+body.lowpc .feedback-input input::placeholder{color:rgba(0,80,160,.35);}
+body.lowpc .modal-box{background:rgba(255,255,255,.98);border-color:rgba(0,100,200,.2);}
+body.lowpc .modal{background:rgba(200,220,255,.5);}
+body.lowpc .online-count{background:rgba(220,240,255,.85);border-color:rgba(0,100,200,.25);color:#0066cc;}
+body.lowpc #matrixCanvas{display:none!important;}
+body.lowpc .music-btn{border-color:rgba(0,100,200,.4)!important;background:rgba(0,80,180,.15)!important;color:#0066cc!important;}
+body.lowpc .music-btn.muted{color:rgba(0,100,200,.3)!important;border-color:rgba(0,100,200,.2)!important;}
+body.lowpc .music-btn.muted::after{background:#0066cc!important;}
+body.lowpc .volume-container{border-color:rgba(0,100,200,.4)!important;background:rgba(0,80,180,.15)!important;}
+body.lowpc .volume-container .vol-icon{color:#0066cc!important;}
+body.lowpc .volume-container .vol-value{color:#0066cc!important;}
+body.lowpc .volume-container input[type=range]{background:linear-gradient(to right,#0066cc 0%,#0066cc 80%,rgba(0,80,160,.2) 80%);}
+body.lowpc .volume-container input[type=range]::-webkit-slider-thumb{background:#0066cc;box-shadow:0 0 6px #0099ff;}
+body.lowpc .volume-container input[type=range]::-moz-range-thumb{background:#0066cc;box-shadow:0 0 6px #0099ff;}
+</style>
+</head>
+
+<body>
+
+<!-- ===== 嘉豪头像 ===== -->
+<img class="jiahao-avatar" src="嘉豪.PNG" alt="嘉豪"
+     onerror="this.src='https://minotar.net/avatar/jiahao/100.png'">
+
+<!-- ===== 背景音乐 ===== -->
+<audio id="bgMusic" autoplay loop></audio>
+<button class="music-btn" id="musicBtn" onclick="toggleMusic()">♪</button>
+<div class="volume-container" id="volumeContainer">
+    <span class="vol-icon" id="volIcon" onclick="toggleMute()">🔊</span>
+    <input type="range" id="volumeSlider" min="0" max="100" value="80" oninput="changeVolume(this.value)">
+    <span class="vol-value" id="volValue">80%</span>
+</div>
+
+<canvas id="matrixCanvas"></canvas>
+
+<!-- ===== 登录状态栏 ===== -->
+<div class="topbar logged-out" id="loginStatus">
+    <span id="loginText">⚠ 未登录 ⚠</span>
+    <img id="topAvatar" class="top-avatar" src="" onclick="openAvatarCenter()">
+    <button class="logout-btn" onclick="logout()">退出</button>
+</div>
+
+<!-- ===== 在线人数 ===== -->
+<div class="online-count" id="onlineCount">
+    <span class="online-dot"></span>
+    <span id="onlineNum">在线：1 人</span>
+</div>
+
+<button class="lowpc-btn" id="lowPcBtn" onclick="toggleLowPC()">低配模式：开</button>
+<button class="top-login-btn" onclick="openModal()">登录 / 注册</button>
+
+<!-- ===== 登录弹窗 ===== -->
+<div class="modal" id="loginModal">
+    <div class="modal-box">
+        <button class="close-btn" onclick="closeModal()">×</button>
+        <div class="modal-tabs">
+            <button class="active" onclick="switchTab('login')">登录</button>
+            <button onclick="switchTab('register')">注册</button>
+        </div>
+        <form class="modal-form" id="loginForm">
+            <input type="text" id="loginUsername" placeholder="用户名（3-10位字符）" maxlength="10" required autocomplete="username">
+            <input type="password" id="loginPassword" placeholder="密码（需含大小写+数字）" maxlength="10" required autocomplete="current-password">
+            <button type="submit">登 录</button>
+        </form>
+        <form class="modal-form hidden" id="registerForm">
+            <input type="text" id="regUsername" placeholder="设置用户名（3-10位）" maxlength="10" required autocomplete="username">
+            <input type="password" id="regPassword" placeholder="设置密码（需含大小写+数字）" maxlength="10" required autocomplete="new-password">
+            <input type="password" id="regConfirmPwd" placeholder="确认密码" maxlength="10" required autocomplete="new-password">
+            <button type="submit">注 册</button>
+        </form>
+    </div>
+</div>
+
+<!-- ===== 头像中心 ===== -->
+<div class="modal" id="avatarModal">
+    <div class="modal-box" style="text-align:center;">
+        <button class="close-btn" onclick="closeModalAvatar()">×</button>
+        <img id="avatarPreview" class="avatar-preview" src="">
+        <input type="file" accept="image/*" onchange="previewAvatar(event)">
+        <br><br>
+        <button onclick="saveAvatar()">保存头像</button>
+    </div>
+</div>
+
+<h1>嘉豪暗网</h1>
+<h2>站长QQ：3832465208</h2>
+<h2>加QQ说明来意</h2>
+
+<a href="https://www.daott.cn/" class="main-link" target="_blank" rel="noopener noreferrer"><h1>进入不找了.cn</h1></a>
+
+<div class="other-links">
+    <div class="link-title">MC游戏专区</div>
+    <a href="https://www.minebbs.com/" target="_blank" rel="noopener noreferrer">我的世界中文论坛</a>
+    <a href="https://www.minecraft.net/" target="_blank" rel="noopener noreferrer">MC官方网站</a>
+    <a href="https://optifine.net/" target="_blank" rel="noopener noreferrer">Optifine高清修复</a>
+    <a href="https://modrinth.com/" target="_blank" rel="noopener noreferrer">模组资源站Modrinth</a>
+
+    <div class="link-title">工具实用链接</div>
+    <a href="https://www.bing.com/" target="_blank" rel="noopener noreferrer">必应搜索</a>
+    <a href="https://tool.chinaz.com/" target="_blank" rel="noopener noreferrer">站长工具</a>
+    <a href="https://www.qq.com/" target="_blank" rel="noopener noreferrer">腾讯QQ官网</a>
+    <a href="https://www.bilibili.com/" target="_blank" rel="noopener noreferrer">哔哩哔哩</a>
+
+    <div class="link-title">娱乐社区链接</div>
+    <a href="https://www.douyin.com/" target="_blank" rel="noopener noreferrer">抖音官网</a>
+    <a href="https://www.kuaishou.com/new-reco" target="_blank" rel="noopener noreferrer">快手官网</a>
+    <a href="https://weibo.com/" target="_blank" rel="noopener noreferrer">新浪微博</a>
+    <a href="https://music.163.com/" target="_blank" rel="noopener noreferrer">网易云音乐</a>
+
+    <div class="link-title">其他资源站点</div>
+    <a href="https://github.com/" target="_blank" rel="noopener noreferrer">GitHub开源仓库</a>
+    <a href="https://www.51miz.com/" target="_blank" rel="noopener noreferrer">素材资源网站</a>
+    <a href="https://www.12306.cn/" target="_blank" rel="noopener noreferrer">12306购票</a>
+</div>
+
+<!-- ===== 留言板 ===== -->
+<div class="feedback-panel">
+    <h3>💬 玩家反馈（每日3条，每条最多100字）</h3>
+    <div class="feedback-list" id="feedbackList"></div>
+    <div class="feedback-input">
+        <input id="feedbackInput" placeholder="随便说点什么…（最多100字）" maxlength="100">
+        <button onclick="addFeedback()">发送</button>
+    </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 自动扩展按钮 ===== */
+(function(){
+    const extMap = {
+        'https://www.minebbs.com/':      { name: 'BBS档案馆',      url: 'https://archive.minebbs.com/' },
+        'https://www.mcbbs.net/':        { name: 'MC百科',      url: 'https://www.mcmod.cn/' },
+        'https://www.minecraft.net/':    { name: '官方反馈',    url: 'https://feedback.minecraft.net/' },
+        'https://optifine.net/':         { name: 'Iris光影',    url: 'https://www.irisshaders.dev/' },
+        'https://modrinth.com/':         { name: 'CurseForge',  url: 'https://www.curseforge.com/minecraft/mc-mods' },
+        'https://www.bing.com/':         { name: '百度',  url: 'https://www.baidu.com/' },
+        'https://tool.chinaz.com/':      { name: '爱站网',      url: 'https://www.aizhan.com/' },
+        'https://www.qq.com/':           { name: 'TIM',         url: 'https://tim.qq.com/' },
+        'https://www.bilibili.com/':     { name: 'AcFun',       url: 'https://www.acfun.cn/' },
+        'https://www.douyin.com/':       { name: '小红书',      url: 'https://www.xiaohongshu.com/' },
+        'https://www.kuaishou.com/new-reco': { name: 'Youtube',      url: 'https://movies.youtube.com/' },
+        'https://www.kuaishou.com/':     { name: '虎牙直播',    url: 'https://www.huya.com/' },
+        'https://weibo.com/':            { name: '今日头条',    url: 'https://www.toutiao.com/' },
+        'https://music.163.com/':        { name: 'QQ音乐',      url: 'https://y.qq.com/' },
+        'https://github.com/':           { name: 'GitLab',      url: 'https://gitlab.com/' },
+        'https://www.51miz.com/':        { name: 'Unsplash',    url: 'https://unsplash.com/' },
+        'https://www.12306.cn/':         { name: '携程旅行',    url: 'https://www.ctrip.com/' },
+        'https://www.daott.cn/435.html': { name: 'daott导航',   url: 'https://daott.cn/' },
+    };
+    document.querySelectorAll('.other-links > a').forEach(a => {
+        const info = extMap[a.href];
+        if (!info) return;
+        const btn = document.createElement('div');
+        btn.className = 'ext-btn';
+        btn.textContent = '扩展：' + info.name;
+        btn.onclick = () => window.open(info.url);
+        a.insertAdjacentElement('afterend', btn);
+    });
+})();
+
+let toastTimer = null;
+function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.remove('show');
+    void t.offsetWidth;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+(function(){
+    const canvas = document.getElementById('matrixCanvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = innerWidth, h = canvas.height = innerHeight;
+    const fontSize = 18, cols = Math.floor(w / fontSize);
+    // 每列保存：当前 y 位置、一串由 0/1 交替组成的尾巴字符列表、尾巴长度
+    const drops = Array.from({ length: cols }, () => ({
+        y: Math.random() * -h / fontSize,          // 起始 y（列索引单位）
+        chars: generateBinaryString(1 + Math.floor(Math.random() * 18)), // 尾巴字符
+        tailLen: 8 + Math.floor(Math.random() * 18) // 尾巴长度
+    }));
+
+    function generateBinaryString(len){
+        let s = '';
+        for (let i = 0; i < len; i++) s += Math.random() > 0.5 ? '1' : '0';
+        return s;
+    }
+
+    let animId;
+    function draw(){
+        // 半透明黑色覆盖，产生拖尾效果
+        ctx.fillStyle = 'rgba(0,0,0,0.08)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.font = fontSize + 'px monospace';
+
+        for (let i = 0; i < cols; i++){
+            const d = drops[i];
+            // 逐字符绘制尾巴：头部亮绿，尾部逐渐变暗
+            for (let j = 0; j < d.chars.length && j < d.tailLen; j++){
+                const alpha = 1 - j / d.tailLen;   // 越远越透明
+                ctx.fillStyle = j === 0
+                    ? '#0f0'                       // 头部最亮
+                    : `rgba(0,255,0,${alpha * 0.6})`; // 尾巴渐隐
+                ctx.fillText(d.chars[j], i * fontSize, (d.y - j) * fontSize);
+            }
+            // 向下移动
+            d.y += 1;
+            // 有一定概率更新头部字符，让 0/1 交替闪烁
+            if (Math.random() > 0.92) {
+                d.chars = Math.random() > 0.5 ? '1' + d.chars.slice(0, -1) : '0' + d.chars.slice(0, -1);
+            } else {
+                d.chars = d.chars.slice(0, -1); // 移除尾部
+            }
+            // 随机补充新字符到尾部
+            if (Math.random() > 0.7) {
+                d.chars += Math.random() > 0.5 ? '1' : '0';
+            }
+            // 超出画布后重置
+            if (d.y * fontSize > h + d.tailLen * fontSize && Math.random() > 0.9) {
+                d.y = Math.random() * -10 - 5;
+                d.chars = generateBinaryString(1 + Math.floor(Math.random() * 8));
+                d.tailLen = 8 + Math.floor(Math.random() * 18);
+            }
+        }
+        animId = requestAnimationFrame(draw);
+    }
+    draw();
+    window.addEventListener('resize', () => {
+        w = canvas.width = innerWidth;
+        h = canvas.height = innerHeight;
+    });
+    window._matrixAnimId = animId;
+})();
+
+/* ===== 低配模式 ===== */
+let lowPcOn = true;
+function toggleLowPC(){
+    lowPcOn = !lowPcOn;
+    document.body.classList.toggle('lowpc', !lowPcOn);
+    document.getElementById('lowPcBtn').textContent = lowPcOn ? '低配模式：开' : '低配模式：关';
+    if (!lowPcOn){
+        if (window._matrixAnimId) { cancelAnimationFrame(window._matrixAnimId); window._matrixAnimId = null; }
+        document.getElementById('matrixCanvas').style.display = 'none';
+        showToast('低配模式已开启');
+    } else {
+        document.getElementById('matrixCanvas').style.display = 'block';
+        showToast('低配模式已关闭');
+        // 重新启动动画
+        initMatrix();
+    }
+}
+
+/* 独立的代码雨初始化函数，供低配模式切换时重新调用 */
+function initMatrix(){
+    const canvas = document.getElementById('matrixCanvas');
+    if (!canvas || document.body.classList.contains('lowpc')) return;
+    const ctx = canvas.getContext('2d');
+    let w = canvas.width = innerWidth, h = canvas.height = innerHeight;
+    const fontSize = 18, cols = Math.floor(w / fontSize);
+    const drops = Array.from({ length: cols }, () => ({
+        y: Math.random() * -h / fontSize,
+        chars: (Math.random() > 0.5 ? '1' : '0'),
+        tailLen: 8 + Math.floor(Math.random() * 18)
+    }));
+
+    function generateBinaryString(len){
+        let s = '';
+        for (let i = 0; i < len; i++) s += Math.random() > 0.5 ? '1' : '0';
+        return s;
+    }
+
+    function draw(){
+        ctx.fillStyle = 'rgba(0,0,0,0.08)';
+        ctx.fillRect(0, 0, w, h);
+        ctx.font = fontSize + 'px monospace';
+        for (let i = 0; i < cols; i++){
+            const d = drops[i];
+            for (let j = 0; j < d.chars.length && j < d.tailLen; j++){
+                const alpha = 1 - j / d.tailLen;
+                ctx.fillStyle = j === 0 ? '#0f0' : `rgba(0,255,0,${alpha * 0.6})`;
+                ctx.fillText(d.chars[j], i * fontSize, (d.y - j) * fontSize);
+            }
+            d.y += 1;
+            if (Math.random() > 0.92) {
+                d.chars = (Math.random() > 0.5 ? '1' : '0') + d.chars.slice(0, -1);
+            } else {
+                d.chars = d.chars.slice(0, -1);
+            }
+            if (Math.random() > 0.7) d.chars += Math.random() > 0.5 ? '1' : '0';
+            if (d.y * fontSize > h + d.tailLen * fontSize && Math.random() > 0.9) {
+                d.y = Math.random() * -10 - 5;
+                d.chars = generateBinaryString(1 + Math.floor(Math.random() * 8));
+                d.tailLen = 8 + Math.floor(Math.random() * 18);
+            }
+        }
+        window._matrixAnimId = requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+/* ===== 背景音乐 ===== */
+const SONGS = ['Friendships Plain Jane.mp3', 'Friendships Plain Jane.mp3'];
+function pickSong(){ return SONGS[Math.floor(Math.random() * SONGS.length)]; }
+
+// 初始化音量
+(function(){
+    const m = document.getElementById('bgMusic');
+    const savedVol = localStorage.getItem('mcMusicVolume');
+    const vol = savedVol !== null ? Number(savedVol) : 80;
+    m.volume = vol / 100;
+    const slider = document.getElementById('volumeSlider');
+    const valLabel = document.getElementById('volValue');
+    slider.value = vol;
+    valLabel.textContent = vol + '%';
+    updateVolBackground(vol);
+    if (vol === 0) document.getElementById('volIcon').textContent = '🔇';
+})();
+
+function showVolumeBar(){
+    const vc = document.getElementById('volumeContainer');
+    vc.classList.add('show');
+}
+
+function updateVolBackground(val){
+    const slider = document.getElementById('volumeSlider');
+    slider.style.background = 'linear-gradient(to right,#00ddff 0%,#00ddff ' + val + '%,rgba(255,255,255,.2) ' + val + '%)';
+}
+
+function changeVolume(val){
+    const m = document.getElementById('bgMusic');
+    const v = Number(val);
+    m.volume = v / 100;
+    localStorage.setItem('mcMusicVolume', v);
+    document.getElementById('volValue').textContent = v + '%';
+    updateVolBackground(v);
+    document.getElementById('volIcon').textContent = v === 0 ? '🔇' : '🔊';
+    if (v > 0 && m.paused){
+        // 用户拖动到非0音量且音乐暂停时自动恢复播放
+        if (!m.src || m.ended) m.src = pickSong();
+        m.play().catch(() => {});
+        document.getElementById('musicBtn').classList.remove('muted');
+    }
+    if (v === 0 && !m.paused){
+        m.pause();
+        document.getElementById('musicBtn').classList.add('muted');
+    }
+    showVolumeBar();
+}
+
+function toggleMute(){
+    const m = document.getElementById('bgMusic');
+    const slider = document.getElementById('volumeSlider');
+    if (m.volume > 0){
+        // 静音，记住当前值
+        slider.dataset.lastVol = slider.value;
+        changeVolume(0);
+    } else {
+        // 恢复
+        const last = slider.dataset.lastVol || 80;
+        changeVolume(last);
+    }
+}
+
+function toggleMusic(){
+    const m = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    if (m.paused){
+        if (!m.src || m.ended) m.src = pickSong();
+        m.play().catch(() => {});
+        btn.classList.remove('muted');
+    } else {
+        m.pause();
+        btn.classList.add('muted');
+    }
+    showVolumeBar();
+}
+
+// 音量条默认常驻显示，无需悬停触发
+
+document.getElementById('bgMusic').addEventListener('ended', function(){
+    this.src = pickSong();
+    this.play().catch(() => {});
+});
+
+/* ===== 在线人数 ===== */
+(function(){
+    const SITE_KEY = 'mc_site_visitors', MY_ID_KEY = 'mc_my_visitor_id';
+    let myId = localStorage.getItem(MY_ID_KEY);
+    if (!myId){
+        myId = 'v_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+        localStorage.setItem(MY_ID_KEY, myId);
+    }
+    let visitors = JSON.parse(localStorage.getItem(SITE_KEY) || '[]');
+    const now = Date.now();
+    visitors = visitors.filter(v => now - v.ts < 300000);
+    const me = visitors.find(v => v.id === myId);
+    if (me) me.ts = now; else visitors.push({ id: myId, ts: now });
+    localStorage.setItem(SITE_KEY, JSON.stringify(visitors));
+    document.getElementById('onlineNum').textContent = '在线：' + visitors.length + ' 人';
+
+    setInterval(() => {
+        let list = JSON.parse(localStorage.getItem(SITE_KEY) || '[]');
+        const n = Date.now();
+        list = list.filter(v => n - v.ts < 300000);
+        const self = list.find(v => v.id === myId);
+        if (self) self.ts = n; else list.push({ id: myId, ts: n });
+        localStorage.setItem(SITE_KEY, JSON.stringify(list));
+        document.getElementById('onlineNum').textContent = '在线：' + list.length + ' 人';
+    }, 3000);
+})();
+
+/* ===== 登录状态 ===== */
+const defaultAvatar = 'https://minotar.net/avatar/steve/100.png';
+
+function updateLoginState(){
+    const u = localStorage.getItem('currentUser');
+    const el = document.getElementById('loginStatus');
+    const text = document.getElementById('loginText');
+    const avatar = document.getElementById('topAvatar');
+    if (u){
+        el.className = 'topbar logged-in';
+        text.textContent = '\uD83D\uDC64 ' + u;
+        avatar.src = localStorage.getItem('avatar_' + u) || defaultAvatar;
+    } else {
+        el.className = 'topbar logged-out';
+        text.textContent = '\u26A0 未登录';
+        avatar.src = '';  // 未登录不显示头像
+    }
+    loadFeedback();
+}
+updateLoginState();
+
+/* ===== 头像管理 ===== */
+function openAvatarCenter(){
+    if (!localStorage.getItem('currentUser')) { showToast('请先登录'); return; }
+    document.getElementById('avatarPreview').src = document.getElementById('topAvatar').src;
+    document.getElementById('avatarModal').classList.add('show');
+}
+function previewAvatar(e){
+    const f = e.target.files[0];
+    if (!f || !f.type.startsWith('image/')) { showToast('仅支持图片文件'); return; }
+    const r = new FileReader();
+    r.onload = ev => document.getElementById('avatarPreview').src = ev.target.result;
+    r.readAsDataURL(f);
+}
+function saveAvatar(){
+    const u = localStorage.getItem('currentUser');
+    if (!u) return;
+    localStorage.setItem('avatar_' + u, document.getElementById('avatarPreview').src);
+    updateLoginState();
+    closeModalAvatar();
+    showToast('头像已保存');
+}
+function closeModalAvatar(){ document.getElementById('avatarModal').classList.remove('show'); }
+
+/* ===== 密码强度校验 ===== */
+function validatePassword(p){
+    if (p.length < 3 || p.length > 10) return '密码需3-10位字符';
+    if (!/[A-Z]/.test(p)) return '密码需包含至少一个大写字母';
+    if (!/[a-z]/.test(p)) return '密码需包含至少一个小写字母';
+    if (!/[0-9]/.test(p)) return '密码需包含至少一个数字';
+    return null;
+}
+
+/* ===== 注册 ===== */
+document.getElementById('registerForm').onsubmit = async e => {
+    e.preventDefault();
+    const u = regUsername.value.trim(), p = regPassword.value;
+
+    if (u.length < 3 || u.length > 10) { showToast('用户名需3-10位字符'); return; }
+    if (!/^[a-zA-Z0-9_]+$/.test(u)) { showToast('用户名仅允许字母、数字、下划线'); return; }
+
+    const pwdErr = validatePassword(p);
+    if (pwdErr) { showToast(pwdErr); return; }
+    if (p !== regConfirmPwd.value) { showToast('两次密码不一致'); return; }
+
+    const users = JSON.parse(localStorage.getItem('mcUsers') || '{}');
+    if (users[u]) { showToast('注册失败：用户已存在'); return; }
+
+    users[u] = await sha256(p);
+    localStorage.setItem('mcUsers', JSON.stringify(users));
+    showToast('🎉 注册成功！请登录');
+    switchTab('login');
+    regUsername.value = ''; regPassword.value = ''; regConfirmPwd.value = '';
+};
+
+/* ===== 登录 ===== */
+document.getElementById('loginForm').onsubmit = async e => {
+    e.preventDefault();
+    const u = loginUsername.value.trim();
+    const p = loginPassword.value;
+
+    const lastAttempt = localStorage.getItem('lastAttempt_' + u);
+    if (lastAttempt && Date.now() - Number(lastAttempt) < 3000) {
+        showToast('操作过于频繁，请3秒后再试');
+        return;
+    }
+    localStorage.setItem('lastAttempt_' + u, Date.now());
+
+    const users = JSON.parse(localStorage.getItem('mcUsers') || '{}');
+    if (!users[u]) {
+        showToast('登录失败：账号不存在');
+        return;
+    }
+    if (users[u] === await sha256(p)){
+        localStorage.setItem('currentUser', u);
+        loginUsername.value = ''; loginPassword.value = '';
+        updateLoginState();
+        closeModal();
+        showToast('🎉 登录成功！欢迎回来，' + u);
+    } else {
+        showToast('登录失败：密码错误');
+    }
+};
+
+function logout(){
+    if (!confirm('确定退出登录？')) return;
+    localStorage.removeItem('currentUser');
+    updateLoginState();
+    showToast('已退出登录');
+}
+
+/* ===== 留言功能 ===== */
+function getGuestId(){
+    let id = localStorage.getItem('guestId');
+    if (!id) { id = 'guest_' + crypto.randomUUID(); localStorage.setItem('guestId', id); }
+    return id;
+}
+function todayKey(){
+    const user = localStorage.getItem('currentUser') || getGuestId();
+    return 'fb_' + user + '_' + new Date().toDateString();
+}
+function loadFeedback(){
+    const list = JSON.parse(localStorage.getItem('siteFeedback') || '[]');
+    const box = document.getElementById('feedbackList');
+    box.innerHTML = '';
+    list.slice().reverse().forEach((fb, i) => {
+        const idx = list.length - 1 - i;
+        const isGuest = fb.user === '游客';
+        const deleteBtn = isGuest
+            ? '<button class="feedback-delete" onclick="deleteFeedback(' + idx + ')" title="删除此评论">\u00D7</button>'
+            : '';
+        box.innerHTML += '<div class="feedback-item">' +
+            '<b>' + fb.user + '</b>' +
+            '<div class="fb-text">' + fb.text + '</div>' +
+            '<span>' + fb.time + '</span>' +
+            deleteBtn +
+            '</div>';
+    });
+}
+function addFeedback(){
+    const text = feedbackInput.value.trim();
+    if (!text) { showToast('内容不能为空'); return; }
+    if (text.length > 100) { showToast('每条评论最多100个字'); return; }
+    const key = todayKey();
+    const count = Number(localStorage.getItem(key) || 0);
+    if (count >= 3) { showToast('今日已达3条上限'); return; }
+    const user = localStorage.getItem('currentUser') || '游客';
+    const list = JSON.parse(localStorage.getItem('siteFeedback') || '[]');
+    list.push({ user, text, time: new Date().toLocaleString() });
+    localStorage.setItem('siteFeedback', JSON.stringify(list));
+    localStorage.setItem(key, count + 1);
+    feedbackInput.value = '';
+    loadFeedback();
+    showToast('发送成功');
+}
+function deleteFeedback(i){
+    const list = JSON.parse(localStorage.getItem('siteFeedback') || '[]');
+    if (!list[i]) { showToast('评论不存在'); return; }
+    if (list[i].user !== '游客') { showToast('只能删除游客的评论'); return; }
+    if (!confirm('确定删除这条游客评论吗？')) return;
+    const key = todayKey();
+    const count = Number(localStorage.getItem(key) || 0);
+    localStorage.setItem(key, Math.max(0, count - 1));
+    list.splice(i, 1);
+    localStorage.setItem('siteFeedback', JSON.stringify(list));
+    loadFeedback();
+    showToast('已删除，可再发一条');
+}
+
+/* ===== 弹窗控制 ===== */
+function openModal(){ document.getElementById('loginModal').classList.add('show'); }
+function closeModal(){ document.getElementById('loginModal').classList.remove('show'); }
+function switchTab(t){
+    document.querySelectorAll('.modal-tabs button').forEach(b => b.classList.remove('active'));
+    document.getElementById('loginForm').classList.toggle('hidden', t !== 'login');
+    document.getElementById('registerForm').classList.toggle('hidden', t !== 'register');
+    document.querySelector('.modal-tabs button:nth-child(' + (t === 'login' ? '1' : '2') + ')').classList.add('active');
+}
+
+/* ===== SHA-256 ===== */
+async function sha256(t){
+    const b = new TextEncoder().encode(t);
+    const h = await crypto.subtle.digest('SHA-256', b);
+    return [...new Uint8Array(h)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+</script>
+</body>
+</html>
